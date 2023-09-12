@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller of all methods in the /crops route.
+ * Controller de todos os metodos da rota /crops.
  */
 @RestController
 @RequestMapping("/crops")
@@ -22,10 +22,10 @@ public class CropController {
   private CropService cropService;
 
   /**
-   * CropController controller constructor.
+   * Construtor do controller CropController.
    *
-   * @param cropService receives the service layer by
-   *        dependency injection.
+   * @param cropService recebe a camada de servico por
+   *                    injecao de dependencia.
    */
   @Autowired
   public CropController(CropService cropService) {
@@ -33,10 +33,10 @@ public class CropController {
   }
 
   /**
-   * Map the GET /crops route with the function of returning a list of
-   * all the plantations in the database.
+   * Mapea a rota GET /crops com a funcao de retornar uma lista com
+   * todas as plantacoes existentes no banco.
    *
-   * @return returns a CropResponseDto list of all the crops.
+   * @return retorna uma lista de CropResponseDto de todas as plantacoes.
    */
   @GetMapping
   public ResponseEntity<List<CropResponseDto>> getAllCrops() {
@@ -45,19 +45,20 @@ public class CropController {
 
     List<CropResponseDto> cropsResponse = allCrops.stream()
         .map(crop -> new CropResponseDto(crop.getId(), crop.getName(),
-            crop.getPlantedArea(), crop.getFarm().getId()))
+            crop.getPlantedArea(), crop.getFarm().getId(), crop.getPlantedDate(),
+            crop.getHarverstDate()))
         .toList();
 
     return ResponseEntity.status(HttpStatus.OK).body(cropsResponse);
   }
 
   /**
-   * Maps the GET /crops/id route to return the information of a crop
-   * specifies.
+   * Mapea a rota GET /crops/id para retornar as informacoes de uma crop
+   * especifica.
    *
-   * @param id id of the searched crop passed by Path
-   * @return returns a ResponseEntity with the specified crop or an error
-   *        if it is not found.
+   * @param id id da crop buscada passada por Path
+   * @return retorna um ResponseEntity com a crop especifica ou um erro
+   *     customizado caso ela nao seja encontrada.
    */
   @GetMapping("/{id}")
   public ResponseEntity getCropById(@PathVariable Long id) {
@@ -66,7 +67,8 @@ public class CropController {
       Crop cropFound = this.cropService.getCropById(id);
 
       CropResponseDto cropResponse = new CropResponseDto(cropFound.getId(),
-          cropFound.getName(), cropFound.getPlantedArea(), cropFound.getFarm().getId());
+          cropFound.getName(), cropFound.getPlantedArea(), cropFound.getFarm().getId(),
+          cropFound.getPlantedDate(), cropFound.getHarverstDate());
 
       return ResponseEntity.status(HttpStatus.OK).body(cropResponse);
 
