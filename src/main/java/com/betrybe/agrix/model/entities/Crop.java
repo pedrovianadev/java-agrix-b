@@ -6,12 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
- * Cria a entidade Crop.
+ * Creates the Crop entity.
  */
 @Entity
 @Table(name = "crop")
@@ -35,14 +38,22 @@ public class Crop {
   @Column(name = "harvest_date")
   private LocalDate harverstDate;
 
+  @ManyToMany
+  @JoinTable(
+      name = "crop_fertilizer",
+      joinColumns = @JoinColumn(name = "fertilizer_id"),
+      inverseJoinColumns = @JoinColumn(name = "crop_id")
+  )
+  private List<Fertilizer> fertilizers;
+
   public Crop() {}
 
   /**
-   * Construtor da entidade Crop.
+   * Crop entity constructor.
    *
-   * @param name nome da Crop criada
-   * @param plantedArea area plantada da crop criada
-   * @param farm farm em que a crop sera relacionada
+   * @param name name of the created Crop
+   * @param plantedArea planted area of the crop created
+   * @param farm farm to which the crop will be related
    */
   public Crop(String name, Double plantedArea, Farm farm,
       LocalDate plantedDate, LocalDate harverstDate) {
@@ -95,5 +106,13 @@ public class Crop {
 
   public void setHarverstDate(LocalDate harverstDate) {
     this.harverstDate = harverstDate;
+  }
+
+  public List<Fertilizer> getFertilizers() {
+    return fertilizers;
+  }
+
+  public void setFertilizers(List<Fertilizer> fertilizers) {
+    this.fertilizers = fertilizers;
   }
 }
