@@ -1,8 +1,11 @@
 package com.betrybe.agrix.service;
 
 import com.betrybe.agrix.exceptions.CropNotFoundException;
+import com.betrybe.agrix.exceptions.FertilizerNotFoundException;
 import com.betrybe.agrix.model.entities.Crop;
+import com.betrybe.agrix.model.entities.Fertilizer;
 import com.betrybe.agrix.model.repositories.CropRepository;
+import com.betrybe.agrix.model.repositories.FertilizerRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class CropService {
 
   private CropRepository cropRepository;
+  private FertilizerRepository fertilizerRepository;
 
   /**
    * Service layer constructor.
@@ -25,8 +29,12 @@ public class CropService {
    *        dependency
    */
   @Autowired
-  public CropService(CropRepository cropRepository) {
+  public CropService(CropRepository cropRepository,
+      FertilizerRepository fertilizerRepository) {
+
     this.cropRepository = cropRepository;
+    this.fertilizerRepository = fertilizerRepository;
+
   }
 
   /**
@@ -92,5 +100,41 @@ public class CropService {
 
     return cropsReturned;
   }
+
+  /**
+   * Associates a fertilizer with a plantation.
+   *
+   * @param cropId id of the crop to be associated
+   * @param fertilizerId id of the fertilizer to be associated
+   * @return returns the updated crop with the associated fertilizer
+   * @throws CropNotFoundException returns an error if the crop is not
+   *        is found
+   * @throws FertilizerNotFoundException returns an error if the fertilizer
+   *        is not found
+   */
+  public Crop setFertilizer(Long cropId, Long fertilizerId)
+      throws CropNotFoundException, FertilizerNotFoundException {
+
+    Optional<Crop> optionalCrop = this.cropRepository.findById(cropId);
+
+    Optional<Fertilizer> optionalFertilizer =
+        this.fertilizerRepository.findById(fertilizerId);
+
+    if (optionalFertilizer.isEmpty()) {
+      throw new FertilizerNotFoundException();
+    }
+
+    if (optionalCrop.isEmpty()) {
+      throw new CropNotFoundException();
+    }
+
+    Crop cropFound = optionalCrop.get();
+    Fertilizer fertilizerFound = optionalFertilizer.get();
+
+    cropFound.getFertilizers().add(fertilizerFound);
+    Crop newCrop = this.cropRepository.save(cropFound);
+    return newCrop;
+  }
+
 
 }

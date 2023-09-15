@@ -121,11 +121,8 @@ public class CropController {
   public ResponseEntity createFertilizerByCropId(@PathVariable Long cropId,
       @PathVariable Long fertilizerId) {
     try {
-      Crop cropFound = this.cropService.getCropById(cropId);
-      Fertilizer fertilizerFound = this.fertilizerService.getFertilizerById(
-          fertilizerId
-      );
-      cropFound.setFertilizers(fertilizerFound);
+      Crop cropAdded = this.cropService.setFertilizer(cropId, fertilizerId);
+      System.out.println(cropAdded);
       return ResponseEntity.status(HttpStatus.CREATED).body(
           "Fertilizante e plantação associados com sucesso!"
       );
@@ -143,5 +140,26 @@ public class CropController {
 
     }
 
+  }
+
+  /**
+   * Method that returns all the fertilizers in a plantation.
+   *
+   * @param cropId id of the searched crop
+   * @return returns all the fertilizers of the searched crop
+   */
+  @GetMapping("/{cropId}/fertilizers")
+  public ResponseEntity getFertilizersFromCropId(@PathVariable Long cropId) {
+    try {
+
+      Crop cropFound = this.cropService.getCropById(cropId);
+      List<Fertilizer> fertilizers = cropFound.getFertilizers();
+
+      return ResponseEntity.status(HttpStatus.OK).body(fertilizers);
+
+    } catch (CropNotFoundException cropNotFoundException) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+          cropNotFoundException.getMessage());
+    }
   }
 }
