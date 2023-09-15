@@ -3,9 +3,11 @@ package com.betrybe.agrix.service;
 import com.betrybe.agrix.exceptions.CropNotFoundException;
 import com.betrybe.agrix.model.entities.Crop;
 import com.betrybe.agrix.model.repositories.CropRepository;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 /**
@@ -70,6 +72,25 @@ public class CropService {
     }
 
     return cropToFound.get();
+  }
+
+  /**
+   * Returns the crops with the harvest date between the
+   * searched dates.
+   *
+   * @param startingDate starting date of search
+   * @param endingDate end date of search
+   * @return returns a list of crops that meet the requirement
+   */
+  public List<Crop> searchCropByDate(LocalDate startingDate, LocalDate endingDate) {
+
+    List<Crop> allCrops = this.cropRepository.findAll();
+    List<Crop> cropsReturned = allCrops.stream()
+        .filter(crop -> startingDate.isBefore(crop.getHarverstDate())
+            && endingDate.isAfter(crop.getHarverstDate()))
+        .toList();
+
+    return cropsReturned;
   }
 
 }
