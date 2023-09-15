@@ -2,6 +2,7 @@ package com.betrybe.agrix.controller;
 
 import com.betrybe.agrix.controller.dto.FertilizerDto;
 import com.betrybe.agrix.controller.dto.FertilizerResponseDto;
+import com.betrybe.agrix.exceptions.FertilizerNotFoundException;
 import com.betrybe.agrix.model.entities.Fertilizer;
 import com.betrybe.agrix.service.FertilizerService;
 import java.util.List;
@@ -66,5 +67,27 @@ public class FertilizersController {
   public ResponseEntity<List<Fertilizer>> getAllFertilizers() {
     List<Fertilizer> allFertilizers = this.fertilizerService.getAllFertilizers();
     return ResponseEntity.status(HttpStatus.OK).body(allFertilizers);
+  }
+
+  /**
+   * Method that returns the fertilizer fetched by the id, mapped
+   * in the GET /fertilizers/id route.
+   *
+   * @param fertilizerId id of the searched fertilizer
+   * @return returns the searched fertilizer
+   */
+  @GetMapping("/{fertilizerId}")
+  public ResponseEntity getFertilizerById(@PathVariable Long fertilizerId) {
+    try {
+
+      Fertilizer fertilizerFound = this.fertilizerService.getFertilizerById(fertilizerId);
+      return ResponseEntity.status(HttpStatus.OK).body(fertilizerFound);
+
+    } catch (FertilizerNotFoundException fertilizerNotFoundException) {
+
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body(fertilizerNotFoundException.getMessage());
+
+    }
   }
 }
